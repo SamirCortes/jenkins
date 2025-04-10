@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000' # Mapeo del puerto de la aplicación NestJS
+    volumes:
+      - ./src:/app/src # Mapeo de volúmenes para desarrollo (opcional)
+    environment:
+      MONGO_DB_URL: 'mongodb+srv://samirolaya9715:2muFBtODJVc26pr0@cluster0.9ugst.mongodb.net/' # URL de conexión a MongoDB
+    depends_on:
+      - mongo
+      - sonarqube # Asegurar que SonarQube esté arriba antes del backend
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - '27017:27017' # Puerto de MongoDB
+    volumes:
+      - mongodb_data:/data/db # Persistencia de datos de MongoDB
+
+  sonarqube:
+    image: sonarqube:lts-community
+    container_name: sonarqube
+    ports:
+      - '9000:9000' # Puerto de la interfaz web de SonarQube
+    environment:
+      SONARQUBE_JDBC_URL: jdbc:postgresql://sonarqube-db:5432/sonarqube
+      SONARQUBE_JDBC_USERNAME: sonar
+      SONARQUBE_JDBC_PASSWORD: sonar
+    depends_on:
+      - sonarqube-db
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+
+  sonarqube-db:
+    image: postgres:latest
+    container_name: sonarqube-db
+    environment:
+      POSTGRES_USER: sonar
+      POSTGRES_PASSWORD: sonar
+      POSTGRES_DB: sonarqube
+    volumes:
+      - sonarqube_db_data:/var/lib/postgresql/data
+
+volumes:
+  mongodb_data: # Volumen para persistencia de datos de MongoDB
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:
+  sonarqube_db_data:
