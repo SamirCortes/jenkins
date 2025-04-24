@@ -8,7 +8,7 @@ pipeline {
   stages {
     stage('Checkout') {
       steps {
-        git 'https://github.com/SamirCortes/jenkins.git'
+        git branch: 'uat', url: 'https://github.com/SamirCortes/jenkins.git'
       }
     }
 
@@ -18,28 +18,28 @@ pipeline {
       }
     }
 
-    stage('Build del proyecto') {
-      steps {
-        sh 'npm run build'
-      }
-    }
-
     stage('Ejecutar pruebas') {
       steps {
         sh 'npm run test'
       }
     }
+
+    stage('Build del proyecto') {
+      steps {
+        sh 'npm run build'
+      }
+    }
   }
 
   post {
-    always {
-      echo 'Proceso terminado.'
-    }
     success {
-      echo '✅ Build exitoso.'
+      echo '✅ Build y pruebas exitosas.'
     }
     failure {
-      echo '❌ Hubo un fallo.'
+      echo '❌ Error durante el pipeline.'
+    }
+    always {
+      echo 'Pipeline finalizado.'
     }
   }
 }
