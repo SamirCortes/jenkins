@@ -8,7 +8,7 @@ pipeline {
   stages {
     stage('Checkout') {
       steps {
-        git branch: 'uat', url: 'https://github.com/SamirCortes/jenkins.git'
+        git branch: 'main', url: 'https://github.com/SamirCortes/jenkins.git'
       }
     }
 
